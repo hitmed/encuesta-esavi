@@ -868,7 +868,7 @@ function validateForm() {
   return valid;
 }
 
-// Get radio value helper
+// Get raw radio value (text)
 function rv(name) {
   return document.querySelector(`input[name="${name}"]:checked`)?.value || '';
 }
@@ -878,21 +878,43 @@ function cv(name) {
   return document.querySelector(`input[name="${name}"]`)?.checked ? 1 : 0;
 }
 
-// Collect all data
+// =============================================
+// CODIFICACIÓN NUMÉRICA
+// =============================================
+// Sí/No → 1/0
+function siNo(name) {
+  const v = rv(name);
+  if (v === 'Sí') return 1;
+  if (v === 'No') return 0;
+  return '';
+}
+
+// Mapas de codificación
+const COD_SEXO = { 'Masculino': 1, 'Femenino': 2 };
+const COD_CATEGORIA = {
+  'Personal de la Clínica de Rehabilitación': 1,
+  'Personal del Hospital': 2,
+  'Paciente Internado en Hospital': 3,
+  'Paciente Internado en Clínica de Rehabilitación': 4
+};
+const COD_TIPO_ESAVI = { 'Leve': 1, 'Moderado': 2, 'Grave': 3 };
+const COD_FIEBRE = { '< 24 horas': 1, '≥ 24 horas': 2, 'No presentó fiebre': 3 };
+
+// Collect all data (codificado numéricamente)
 function collectData() {
   const esaviSi = rv('esavi_48h') === 'Sí';
 
   return {
     timestamp: new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' }),
-    consentimiento: rv('consentimiento'),
+    consentimiento: siNo('consentimiento'),
     edad: parseInt(document.getElementById('inputEdad').value) || 0,
-    sexo: rv('sexo'),
-    categoria: rv('categoria'),
-    vacuna_previa: rv('vacuna_previa'),
-    inmunosupresion: rv('inmunosupresion'),
-    esavi_48h: rv('esavi_48h'),
-    tipo_esavi: esaviSi ? rv('tipo_esavi') : 'Sin reacción',
-    // Síntomas (1/0)
+    sexo: COD_SEXO[rv('sexo')] || '',
+    categoria: COD_CATEGORIA[rv('categoria')] || '',
+    vacuna_previa: siNo('vacuna_previa'),
+    inmunosupresion: siNo('inmunosupresion'),
+    esavi_48h: siNo('esavi_48h'),
+    tipo_esavi: esaviSi ? (COD_TIPO_ESAVI[rv('tipo_esavi')] || '') : 0,
+    // Síntomas (1/0 por columna)
     sint_cefalea: esaviSi ? cv('sint_cefalea') : 0,
     sint_fiebre: esaviSi ? cv('sint_fiebre') : 0,
     sint_garganta: esaviSi ? cv('sint_garganta') : 0,
@@ -905,16 +927,17 @@ function collectData() {
     sint_adenomegalias: esaviSi ? cv('sint_adenomegalias') : 0,
     sint_anafilaxia: esaviSi ? cv('sint_anafilaxia') : 0,
     sint_sincope: esaviSi ? cv('sint_sincope') : 0,
-    // Otros campos texto
-    duracion_fiebre: esaviSi ? rv('duracion_fiebre') : 'No presentó fiebre',
+    // Duración fiebre (codificada)
+    duracion_fiebre: esaviSi ? (COD_FIEBRE[rv('duracion_fiebre')] || '') : 3,
+    // Campos texto libre (sin codificar)
     deterioro_sensorio: esaviSi ? (document.querySelector('textarea[name="deterioro_sensorio"]').value || '') : '',
     afectacion_cv: esaviSi ? (document.querySelector('textarea[name="afectacion_cv"]').value || '') : '',
     otros_sintomas: esaviSi ? (document.querySelector('textarea[name="otros_sintomas"]').value || '') : '',
-    // Resultado ESAVI
-    requirio_tto: esaviSi ? rv('requirio_tto') : '',
-    riesgo_vida: esaviSi ? rv('riesgo_vida') : '',
-    empeoramiento: esaviSi ? rv('empeoramiento') : '',
-    requirio_internacion: esaviSi ? rv('requirio_internacion') : '',
+    // Resultado ESAVI (1=Sí, 0=No)
+    requirio_tto: esaviSi ? siNo('requirio_tto') : '',
+    riesgo_vida: esaviSi ? siNo('riesgo_vida') : '',
+    empeoramiento: esaviSi ? siNo('empeoramiento') : '',
+    requirio_internacion: esaviSi ? siNo('requirio_internacion') : '',
     // Charlson items (1/0)
     cci_iam: cv('cci_iam'),
     cci_icc: cv('cci_icc'),
