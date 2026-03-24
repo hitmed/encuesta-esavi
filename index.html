@@ -625,8 +625,7 @@
           <label class="question-label">8. Tipo de ESAVI</label>
           <p class="question-hint">Solo si la respuesta anterior fue 'Sí'</p>
           <div class="option-group">
-            <label class="option-item"><input type="radio" name="tipo_esavi" value="Leve"><span>Leve</span></label>
-            <label class="option-item"><input type="radio" name="tipo_esavi" value="Moderado"><span>Moderado</span></label>
+            <label class="option-item"><input type="radio" name="tipo_esavi" value="No Grave"><span>No Grave</span></label>
             <label class="option-item"><input type="radio" name="tipo_esavi" value="Grave"><span>Grave</span></label>
           </div>
         </div>
@@ -897,7 +896,7 @@ const COD_CATEGORIA = {
   'Paciente Internado en Hospital': 3,
   'Paciente Internado en Clínica de Rehabilitación': 4
 };
-const COD_TIPO_ESAVI = { 'Leve': 1, 'Moderado': 2, 'Grave': 3 };
+const COD_TIPO_ESAVI = { 'No Grave': 1, 'Grave': 2 };
 const COD_FIEBRE = { '< 24 horas': 1, '≥ 24 horas': 2, 'No presentó fiebre': 3 };
 
 // Collect all data (codificado numéricamente)
